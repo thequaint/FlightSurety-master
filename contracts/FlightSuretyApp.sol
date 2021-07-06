@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.4.24;
 
 // It's important to avoid vulnerabilities due to numeric overflow bugs
 // OpenZeppelin's SafeMath library, when used correctly, protects agains such bugs
@@ -162,7 +162,8 @@ contract FlightSuretyApp {
     */ 
     function buyFlight(        string flight,
                                address air,
-                               address buyeraddress
+                               address buyeraddress,
+                               uint256 amount
                                            )
                                 external
                                 payable
@@ -170,34 +171,51 @@ contract FlightSuretyApp {
                                 { require(msg.value<=1000000000000000000,
                                 "Value between 0 and 1 ether is supported only");
                                   require(msg.value>=0,"Value not supported");
-                                  flightSuretyData.buy(air,buyeraddress);
+                                  flightSuretyData.buy(air,buyeraddress,amount);
                                   insurancebuyeraddress[flight]=buyeraddress;
                                   
                                 }
                            
-    function ispurchased(string flight) public view returns (bool){
+    function ispurchased(string flight) public view returns (address){
             bool puechase=false;
             if(insurancebuyeraddress[flight]!=0){
                 puechase= true;
             }
-            return puechase;
+            return insurancebuyeraddress[flight];
 
         
 
     }
+    function isbuyerexit(string flight) public view returns (uint256){
+        //require(insurancebuyeraddress[flight]!=0)
+        uint256 a=flightSuretyData.insurancebuyercheck(insurancebuyeraddress[flight]);
+        return a;
+    }
                                       
 
-    function payout(  address buyeraddress)
+    function payout(  address  buyeraddress)
                                 external
                                 payable
                                 requireIsOperational
                                 {
 
-                            
-                            flightSuretyData.pay(buyeraddress);
+                            uint256 cost=1.5 ether; 
+                            uint256 credit=flightSuretyData.payback(buyeraddress);
+                            cost=cost*credit;
+                            msg.sender.transfer(cost);
+                           //creditcheck1;
+                            emit check3(credit,buyeraddress,buyeraddress);
+                         ///  buyeraddress.transfer(refund);
 
-    }         
-
+    }      
+    event check3(uint256 creditcheck,address a1,address a2);   
+    function creditcheck1(address my)external{
+        uint256 a = flightSuretyData.checkcredit();
+        address b= flightSuretyData.checkcredit2();
+        address c= flightSuretyData.checkcredit3(my);
+        
+       
+    }
 
     function processFlightStatus
                                 (
@@ -208,14 +226,17 @@ contract FlightSuretyApp {
     {   bytes32 fightkey=getFlightKey(airline, flight, timestamp);
         require(flights[fightkey].isRegistered==false,"flight not registered");
         require(insurancebuyeraddress[flight]!=0,"Flight is not purchaed");
+        address buyeradd=insurancebuyeraddress[flight];
+        
+        require(isbuyerexit(flight)!=0,"NOT purchased part 1");
         flights[fightkey].statusCode=statusCode1;
         
 
         
         if(statusCode1==STATUS_CODE_LATE_WEATHER||statusCode1==STATUS_CODE_LATE_AIRLINE||statusCode1==STATUS_CODE_LATE_OTHER){
-            address buyeradd=insurancebuyeraddress[flight];
+            
             flightSuretyData.creditInsurees(buyeradd);
-            emit FlightStatusInfo(airline, flight, timestamp, statusCode1);
+         //   emit FlightStatusInfo(airline, flight, timestamp, statusCode1);
         }
 
     }
@@ -349,9 +370,9 @@ contract FlightSuretyApp {
         // Information isn't considered verified until at least MIN_RESPONSES
         // oracles respond with the *** same *** information
         emit OracleReport(airline, flight, timestamp, statusCode);
-        if (oracleResponses[key].responses[statusCode].length >= MIN_RESPONSES) {
+        if (oracleResponses[key].responses[statusCode].length >= 1) {
 
-           // emit FlightStatusInfo(airline, flight, timestamp, statusCode);
+            emit FlightStatusInfo(airline, flight, timestamp, statusCode);
 
             // Handle flight status as appropriate
             processFlightStatus(airline, flight, timestamp, statusCode);
@@ -436,7 +457,8 @@ contract FlightSuretyData{
     function buy
                             (   
                                 address airline,
-                                address buyeraddress
+                                address buyeraddress,
+                                uint256 cost
                                 
 
                             )
@@ -457,15 +479,32 @@ contract FlightSuretyData{
                             public
                             payable; 
     
-    function pay
+    function payback
                             (
-                                address payments
+                              address buyeraddress  
                                 
                             )
                             external
-                            payable
+                            returns(uint256)
+                            
                             ;
-                          
+    function insurancebuyercheck(address buyer)
+                            public 
+                            view 
+                            returns(uint256);   
+    function checkcredit( ) 
+                            external 
+                             
+                            returns(uint256);  
+     function checkcredit2( ) 
+                            external 
+                             
+                            returns(address);
+                            
+    function checkcredit3( address mine) 
+                            external 
+                             
+                            returns(address);                          
     
 }
 

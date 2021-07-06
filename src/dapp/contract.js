@@ -102,7 +102,7 @@ export default class Contract {
         }
 
         
-        await self.flightSuretyApp.methods.buyFlight(payload.flight,self.airlines[0],payload.consumeraddress )
+        await self.flightSuretyApp.methods.buyFlight(payload.flight,self.airlines[0],payload.consumeraddress,cost )
             .send({from:pas,value:insurancePremium,gas:3000000},(error,result)=>{
                 callback(error,result)
                
@@ -110,18 +110,39 @@ export default class Contract {
             
     }
 
+    // async passangerswithdraw(callback){
+    //     let self=this;
+    //   //  let insurancePremium = self.web3.utils.toWei(3,'ether');
+    //     let value1= self.web3.utils.toWei("2", "ether");
+    //     let payload={
+    //         consumeraddress:self.passengers[0]
+            
+    //     }
+    //     await self.flightSuretyApp.methods
+    //         .payout(self.passengers[0] )
+    //         .send({from:payload.consumeraddress,gas:3000000},(error,result)=>{      callback(error,result)
+               
+    //     });
+        
+    //     //    
+    // }
     async passangerswithdraw(callback){
         let self=this;
+      //  let insurancePremium = self.web3.utils.toWei(3,'ether');
+       // let value1= self.web3.utils.toWei("2", "ether");
         let payload={
             consumeraddress:self.passengers[0]
             
         }
         await self.flightSuretyApp.methods
-            .payout(self.passengers[0] )
-            .send({from:payload.consumeraddress},(error,result)=>{
-                callback(error,payload)
-            });
+            .payout(payload.consumeraddress )
+            .send({from:payload.consumeraddress,gas:3000000},(error,result)=>{      callback(error,result)
+               
+        });
+        
+        //    
     }
+   // creditcheck1
     
     //var Request = require("request");
 

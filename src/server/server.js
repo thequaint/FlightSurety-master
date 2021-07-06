@@ -88,12 +88,12 @@ const registerOrc = async () => {
       
       // Get oracle information
       let oracleIndexes = await flightSuretyApp.methods.getMyIndexes().call({ from: accounts[a],gas:300000});
-      //console.log(oracleIndexes);
+      console.log(oracleIndexes);
       for(let idx=0;idx<3;idx++) {
 
         try {
           // Submit a response...it will only be accepted if there is an Index match
-          await flightSuretyApp.methods.submitOracleResponse( oracleIndexes[idx], airline, flight, timestamp,50 ).send({ from: accounts[a],gas:3000000 });
+          await flightSuretyApp.methods.submitOracleResponse( index, airline, flight, timestamp,50 ).send({ from: accounts[a] ,gas:3000000});
 
         }
         catch(e) {
@@ -105,20 +105,25 @@ const registerOrc = async () => {
     }
   
 }
+flightSuretyApp.events.FlightStatusInfo({
+  fromBlock: 0
+}, function (error, event) {
+  if (error) console.log(error)
+  console.log(event)
+  
+  
+});
 
 flightSuretyApp.events.OracleRequest({
   fromBlock: 0
-}, (err, res) => {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log(res);
-    submitOracle(res);
-    //res.stopWatching();tionality check
-  }
-});
+}, function (error, event) {
+  if (error) console.log(error)
+  console.log(event);
+  submitOracle(event);
+   
+ });
 
-
+ 
 
 
 
@@ -130,16 +135,17 @@ flightSuretyApp.events.OracleReport({
   
   
  });
-
-
-flightSuretyApp.events.FlightStatusInfo({
+ 
+ flightSuretyApp.events.check3({
   fromBlock: 0
 }, function (error, event) {
   if (error) console.log(error)
   console.log(event)
   
   
-});
+ });
+
+
 
 
 

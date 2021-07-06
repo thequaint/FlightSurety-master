@@ -40,7 +40,7 @@ import './flightsurety.css';
            // let flight = DOM.elid('flight-number').value;
             // Write transaction
             contract.passangerswithdraw( (error, result) => {
-                display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status2', error: error, value: result.flight + ' ' + result.timestamp} ]);
+                display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status2', error: error, value: result + ' ' + result} ]);
             });
             
         })

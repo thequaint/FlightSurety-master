@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.4.24;
 
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -13,15 +13,23 @@ contract FlightSuretyData {
     address private contractOwner;                                      // Account used to deploy contract
     bool private operational = true;     
     uint8 counter=1;
+    //uint256 cc1=0;
+    address checkadd;
+    address add2;
                                    // Blocks all state changes throughout the contract if false
+    //mapping(address=>uint256)  memory pay;
+    
     mapping(address=>bool) private ra;
-    mapping(address=>uint256) public ib;
+    mapping(address=>uint256) private ib;
     mapping(address=>bool) private funded;
     mapping(address=>bool) private praposal;
     mapping(address=>bool) private votes;
-    mapping(address=>uint256) private paydue;
+    
     mapping(address=>address) private votemap;
     mapping(address=>uint256) private rv;
+    mapping(address=>uint256) private duepay;
+    //event check(uint256);
+    //event check1(uint256);
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
     /********************************************************************************************/
@@ -138,7 +146,16 @@ contract FlightSuretyData {
     {   
         return msg.sender;
     }
-
+     
+    
+    function insurancebuyercheck(address buyer)
+                            public 
+                            view 
+                            returns(uint256)
+    {   
+       // require(ib[buyer]!=0,"Not puchached the sum");
+        return ib[buyer];
+    }
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
@@ -224,7 +241,8 @@ contract FlightSuretyData {
     */   
     function buy
                             (   address airline,
-                                address buyeraddress
+                                address buyeraddress,
+                                uint256 cost
                                
 
                             )
@@ -234,7 +252,8 @@ contract FlightSuretyData {
     {   //check
         require(ib[buyeraddress]==0,"Buyer already purchased flight");
         //effect
-        ib[buyeraddress]=msg.value;
+       /// uint256 amount=msg.value;
+        ib[buyeraddress]=ib[buyeraddress]+cost;
         //interaction
         
        // .transfer(cost);
@@ -246,6 +265,9 @@ contract FlightSuretyData {
     /**
      *  @dev Credits payouts to insurees
     */
+   
+
+
     function creditInsurees
                                 (
                                     address buyeraddress
@@ -255,14 +277,51 @@ contract FlightSuretyData {
                                 external
                                 
     {   //check
+        uint256 a;
+        uint256 b;
         require(ib[buyeraddress]!=0,"Not purchased");
         //effect
         uint256 cost=ib[buyeraddress];
+        //cc1=ib[buyeraddress];
+
+        
         delete (ib[buyeraddress]);
-        paydue[buyeraddress]=cost;
+        //uint256 cost1=cost.mul(3).div(2);
+       //        cc1=
+        duepay[buyeraddress]=cost;
+//cc1=b;                                                                                                                                                                                
+        //checkadd=buyeraddress;
+
+       // cc1=cost;
         //interaction
        // _transferFrom(flight,buyeraddress,10);
+       // emit check(paydue[buyeraddress]);
+       
+    }
+    function payback( address buyeraddress) external  returns(uint256) {
+                require(duepay[buyeraddress]!=0,"Buyer not eligible for payout");
+                uint256 bal=duepay[buyeraddress];
+                delete(duepay[buyeraddress]); 
+                return bal;
+               
+    }
 
+    function checkcredit() external  returns(uint256){
+           uint256 cc1=1;           
+           uint256 cc2=cc1*3;
+           uint256 cc3=cc2/2;
+           ///checkadd.transfer(cc3);
+           return (cc3);
+    }
+    function checkcredit2() external  returns(address){
+
+
+           return (checkadd);
+    }
+    function checkcredit3(address mine) external  returns(address){
+
+         //  cc1=duepay[mine];
+           return (mine);
     }
     
 
@@ -270,28 +329,32 @@ contract FlightSuretyData {
      *  @dev Transfers eligible payout funds to insuree
      *
     */
-    function pay
-                            (
-                                address payments
+    // function pay
+    //                         (
+    //                             address  payments
                                 
-                            )
-                            external
-                            payable
-                            requireIsOperational
-    {
-        //check
-        require(paydue[payments] !=0 ,"Not eligible to get paid");
-        //effect
-        uint256 cost=paydue[payments];
-        //intractions
-        delete(paydue[payments]);
-        uint256 a=cost*3;
-        uint256 b=a/2;
+    //                         )
+    //                         external
+    //                         payable
+    //                         requireIsOperational
+    //                         returns(uint256)
+    // {
+    //     //check
+    //   // require(paydue[payments] !=0 ,"Not eligible to get paid");
+    //     //effect
 
-        msg.sender.transfer(b);
+    //     //donepay[payments]+= paydue[payments];
+        
+    //     //delete(paydue[payments]);
+    //     //uint256 a=cost*3;
+    //     //uint256 b=a/2;
+    //     //intractions
+    //    // uint256 bal=1.5 ether;
+    //     //payments.transfer(b);
+    //     return donepay[payments];
 
-    }
-
+    // }
+   
    /**
     * @dev Initial funding for the insurance. Unless there are too many delayed flights
     *      resulting in insurance payouts, the contract should be self-sustaining
@@ -311,6 +374,7 @@ contract FlightSuretyData {
        // require(msg.value== 1,"value not as required");
        // msg.sender.transfer(msg.value);
         funded[msg.sender]=true;
+        //address(this).transfer(msg.value);
     }
                    
     function getFlightKey
@@ -332,7 +396,8 @@ contract FlightSuretyData {
     */
     function() 
                             external 
-                            payable 
+                            payable
+                             
     {
         fund();
     }
