@@ -60,7 +60,7 @@ const registerOrc = async () => {
 
 //
  // ARRANGE
-  const submitOracle= async(event)=>{
+  async function submitOracle(event){
   const TEST_ORACLES_COUNT=10;
   const index = event.returnValues.index;
   const airline = event.returnValues.airline;
@@ -82,22 +82,23 @@ const registerOrc = async () => {
     // not requested so while sub-optimal, it's a good test of that feature
     let accounts=await web3.eth.getAccounts();
     let counter=0;
+   // let account=accounts[a];
     for(let a=1; a<TEST_ORACLES_COUNT; a++) {
-      let account=accounts[a];
+      
       
       // Get oracle information
-      let oracleIndexes = await flightSuretyApp.methods.getMyIndexes().call({ from: account,gas:300000});
-      console.log(oracleIndexes);
+      let oracleIndexes = await flightSuretyApp.methods.getMyIndexes().call({ from: accounts[a],gas:300000});
+      //console.log(oracleIndexes);
       for(let idx=0;idx<3;idx++) {
 
         try {
           // Submit a response...it will only be accepted if there is an Index match
-          await flightSuretyApp.methods.submitOracleResponse( index, airline, flight, timestamp,50 ).send({ from: account,gas:3000000 });
+          await flightSuretyApp.methods.submitOracleResponse( oracleIndexes[idx], airline, flight, timestamp,50 ).send({ from: accounts[a],gas:3000000 });
 
         }
         catch(e) {
           // Enable this when debugging
-           console.log('\nError1', idx, oracleIndexes[idx], flight, timestamp,account,counter++);
+           console.log('\nError1', idx, oracleIndexes[idx], flight, timestamp,accounts[a],counter++);
         }
 
       }
@@ -105,38 +106,40 @@ const registerOrc = async () => {
   
 }
 
-
-
-
-
 flightSuretyApp.events.OracleRequest({
-    fromBlock: 0
-  }, function (error, event) {
-    if (error) console.log(error)
-    console.log(event)
-    submitOracle(event);
-    
-    
+  fromBlock: 0
+}, (err, res) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(res);
+    submitOracle(res);
+    //res.stopWatching();tionality check
+  }
 });
 
-// flightSuretyApp.events.OracleReport({
-//   fromBlock: 0
-// }, function (error, event) {
-//   if (error) console.log(error)
-//   console.log(event)
-  
-  
-//  });
 
 
-// flightSuretyApp.events.FlightStatusInfo({
-//   fromBlock: 0
-// }, function (error, event) {
-//   if (error) console.log(error)
-//   console.log(event)
+
+
+flightSuretyApp.events.OracleReport({
+  fromBlock: 0
+}, function (error, event) {
+  if (error) console.log(error)
+  console.log(event)
   
   
-// });
+ });
+
+
+flightSuretyApp.events.FlightStatusInfo({
+  fromBlock: 0
+}, function (error, event) {
+  if (error) console.log(error)
+  console.log(event)
+  
+  
+});
 
 
 
