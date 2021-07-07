@@ -13,7 +13,7 @@ contract FlightSuretyData {
     address private contractOwner;                                      // Account used to deploy contract
     bool private operational = true;     
     uint8 counter=1;
-    //uint256 cc1=0;
+    uint256 cc1=0;
     address checkadd;
     address add2;
                                    // Blocks all state changes throughout the contract if false
@@ -250,7 +250,7 @@ contract FlightSuretyData {
                             payable
                             requireIsOperational
     {   //check
-        require(ib[buyeraddress]==0,"Buyer already purchased flight");
+       // require(ib[buyeraddress]==0,"Buyer already purchased flight");
         //effect
        /// uint256 amount=msg.value;
         ib[buyeraddress]=ib[buyeraddress]+cost;
@@ -289,7 +289,7 @@ contract FlightSuretyData {
         //uint256 cost1=cost.mul(3).div(2);
        //        cc1=
         duepay[buyeraddress]=cost;
-//cc1=b;                                                                                                                                                                                
+        cc1=duepay[buyeraddress];                                                                                                                                                                                
         //checkadd=buyeraddress;
 
        // cc1=cost;
@@ -307,11 +307,10 @@ contract FlightSuretyData {
     }
 
     function checkcredit() external  returns(uint256){
-           uint256 cc1=1;           
-           uint256 cc2=cc1*3;
-           uint256 cc3=cc2/2;
+           //uint256 cc1=1;           
+           
            ///checkadd.transfer(cc3);
-           return (cc3);
+           return (cc1);
     }
     function checkcredit2() external  returns(address){
 

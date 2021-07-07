@@ -45,10 +45,10 @@ import './flightsurety.css';
             
         })
         DOM.elid('submit-flight').addEventListener('click', () => {
-             let flight = DOM.elid('flight-number1').value;
+             //let flight = DOM.elid('flight-number1').value;
              // Write transaction
-             contract.registerFlight(flight, (error, result) => {
-                 display('flight', 'flight ', [ { label: 'Registered flight', error: error, value: result.flight} ]);
+             contract.registerFlight("ok", (error, result) => {
+                 display('flight', 'flight ', [ { label: 'Registered flight', error: error, value: result} ]);
              });
              
          })

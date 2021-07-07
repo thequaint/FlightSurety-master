@@ -202,25 +202,6 @@ contract('Flight Surety Tests', async (accounts) => {
   //       assert.equal(balancePreTransaction3-balancePreTransaction,balancePreTransaction1-balancePreTransaction4,'check insurance buyer transaction');
   //  });
    
-   it('buyFlight ',async()=>{
-
-     try{
-      
-      await config.flightSuretyApp.buyFlight("Barkudapalko",accounts[0],accounts[8],1,{from:accounts[8],value:1000000000000000000});
-     }
-     catch(e){console.log(e);}
-     try{
-     let result=await config.flightSuretyApp.ispurchased("Barkudapalko");
-
-     let result1=await config.flightSuretyApp.isbuyerexit("Barkudapalko");
-
-     await config.flightSuretyData.creditInsurees(result);
-     console.log(result,result1);
-     
-     }
-     catch(e){console.log(e);}
-     
-    
-   });
+  
   
 });

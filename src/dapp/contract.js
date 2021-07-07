@@ -67,34 +67,46 @@ export default class Contract {
          
     async registerFlight(flight,callback){
         let self=this;
+        let i=4;
+        let flights=["Canada","USA","RUSSIA","CHINA"];
         
         let payload = {
             airline: self.airlines[0],
-            flight: flight,
+           // flight: flight,
             timestamp: Math.floor(Date.now() / 1000)
         }
-            
+        
+        while(i>0){
+           // let flight=self.flights[i-1];
+            await self.flightSuretyApp.methods.registerFlight(payload.airline, flights[i-1], payload.timestamp)
+            .send({from:self.airlines[0], gas: 300002},(error,result) =>{
+            callback(error,flights[i-1]);
+            i--;
+        });
+        }    
        
-
-        await self.flightSuretyApp.methods.registerFlight(payload.airline, payload.flight, payload.timestamp)
-            .send({from:self.airlines[1], gas: 300002},(error,result) =>{
-                //var result1=web3.utils.hexToAscii(JSON.stringify(result));
-                callback(error,payload);
-                console.log("JUST THIS CHECK",payload) ; 
+         
+        // await self.flightSuretyApp.methods.registerFlight(payload.airline, payload.flight, payload.timestamp)
+        //     .send({from:self.airlines[0], gas: 300002},(error,result) =>{
+        //         //var result1=web3.utils.hexToAscii(JSON.stringify(result));
+        //         callback(error,payload);
+        //         console.log("JUST THIS CHECK",payload) ; 
                // self.flight1.push(payload);
                 //console.log(flight1);
                 //storeflight(payload);
                /// callflight();
-            });
+            // });
        
 
             
             
     }  
+
     async passengerspay(flight,cost,callback){
         let self=this;
         let pas=self.passengers[0];
          let insurancePremium = self.web3.utils.toWei(cost,'ether');
+        //let cost1=self.web3.utils.fromWei(insurancePremium, 'ether');
        // console.log(insurancePremium);
         let payload={
             consumeraddress:self.passengers[0],
@@ -102,7 +114,7 @@ export default class Contract {
         }
 
         
-        await self.flightSuretyApp.methods.buyFlight(payload.flight,self.airlines[0],payload.consumeraddress,cost )
+        await self.flightSuretyApp.methods.buyFlight(payload.flight,self.airlines[0],payload.consumeraddress, insurancePremium)
             .send({from:pas,value:insurancePremium,gas:3000000},(error,result)=>{
                 callback(error,result)
                
@@ -136,7 +148,7 @@ export default class Contract {
         }
         await self.flightSuretyApp.methods
             .payout(payload.consumeraddress )
-            .send({from:payload.consumeraddress,gas:3000000},(error,result)=>{      callback(error,result)
+            .send({from:payload.consumeraddress,gas:3000000},(error,result)=>{ callback(error,result)
                
         });
         

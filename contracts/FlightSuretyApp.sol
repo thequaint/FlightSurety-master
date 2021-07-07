@@ -5,6 +5,7 @@ pragma solidity ^0.4.24;
 // More info: https://www.nccgroup.trust/us/about-us/newsroom-and-events/blog/2018/november/smart-contract-insecurity-bad-arithmetic/
 
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
+
 // import "../contracts/FlightSuretyData.sol";
 
                         /************************************************** */
@@ -168,10 +169,14 @@ contract FlightSuretyApp {
                                 external
                                 payable
                                 requireIsOperational
-                                { require(msg.value<=1000000000000000000,
+                                { //require(msg.value<=1000000000000000000,
+                                require(msg.value<=1 ether,
                                 "Value between 0 and 1 ether is supported only");
-                                  require(msg.value>=0,"Value not supported");
-                                  flightSuretyData.buy(air,buyeraddress,amount);
+                                  
+                                  require(msg.value>0 ether,"Value not supported");
+                                  require(flight1[flight]==true,"Flight not registered ");
+                                  require(insurancebuyeraddress[flight]!=buyeraddress,"Already purchesd this flight");
+                                  flightSuretyData.buy(air,buyeraddress,msg.value);
                                   insurancebuyeraddress[flight]=buyeraddress;
                                   
                                 }
@@ -198,22 +203,32 @@ contract FlightSuretyApp {
                                 payable
                                 requireIsOperational
                                 {
-
-                            uint256 cost=1.5 ether; 
+                            
+                            uint256 cost=1 wei; 
                             uint256 credit=flightSuretyData.payback(buyeraddress);
                             cost=cost*credit;
-                            msg.sender.transfer(cost);
+                            uint256 credit1=cost+(cost/2);
+                            
+                            msg.sender.transfer(credit1);
+                            emit check3(credit1,cost,credit);
                            //creditcheck1;
-                            emit check3(credit,buyeraddress,buyeraddress);
-                         ///  buyeraddress.transfer(refund);
+                            
+                         
 
     }      
-    event check3(uint256 creditcheck,address a1,address a2);   
+    event check3(uint256 creditcheck,uint a1,uint a2);   
     function creditcheck1(address my)external{
         uint256 a = flightSuretyData.checkcredit();
-        address b= flightSuretyData.checkcredit2();
-        address c= flightSuretyData.checkcredit3(my);
+        uint256 g=1 wei;
         
+        uint256  p= a*g;
+        uint256   l=p/2;
+        uint256  h=l+p;
+        my.transfer(p);
+       
+        
+       
+        emit check3(a,p,h);
        
     }
 
