@@ -51,5 +51,4 @@ Deploy the contents of the ./dapp folder
 * [Ethereum Blockchain Explorer](https://etherscan.io/)
 * [Web3Js Reference](https://github.com/ethereum/wiki/wiki/JavaScript-API)
 
-ganache-cli -m "mesomanic"
-leaf useful desert action head wagon enemy turtle guilt denial industry master
+
